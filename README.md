@@ -34,11 +34,3 @@ TripDriver_BE
 ├── TripDriver_BE.Repo
 └── TripDriver_BE.sln
 ```
-
-
-## Project Structure
-TripDriver_BE
-├── TripDriver_BE.Api
-├── TripDriver_BE.Service
-├── TripDriver_BE.Repo
-└── TripDriver_BE.sln
