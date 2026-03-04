@@ -1,0 +1,6 @@
+@TripDriver_BE.Api_HostAddress = https://localhost:7088
+
+GET {{TripDriver_BE.Api_HostAddress}}/swagger/
+Accept: application/json
+
+###

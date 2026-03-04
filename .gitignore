@@ -1,0 +1,48 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / VSCode
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Local settings
+appsettings.Development.json
+
+# Nuget packages
+*.nupkg
+packages/
+
+# Database
+*.mdf
+*.ldf
+
+# Temporary files
+*.tmp
+*.temp
+
+# Test results
+TestResults/
+
+# Publish folder
+publish/
+
+# Node (nếu sau này có frontend)
+node_modules/
