@@ -24,13 +24,18 @@ Backend API for a **Self-Drive Car Rental System**.
 * Booking and rental workflow
 * Deposit payment handling
 * Booking status tracking
-* ## \## Project Structure
-* ## 
-* ## ```
-* ## TripDriver\_BE
-* ## ├── TripDriver\_BE.Api
-* ## ├── TripDriver\_BE.Service
-* ## ├── TripDriver\_BE.Repo
-* ## └── TripDriver\_BE.sln
-* ## ```
-* 
+
+## 
+
+###### \## Project Structure
+
+###### TripDriver\_BE
+
+###### ├── TripDriver\_BE.Api
+
+###### ├── TripDriver\_BE.Service
+
+###### ├── TripDriver\_BE.Repo
+
+###### └── TripDriver\_BE.sln
+
