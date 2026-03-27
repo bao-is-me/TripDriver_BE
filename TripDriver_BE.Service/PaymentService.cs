@@ -8,6 +8,7 @@ public class PaymentService
 {
     private readonly AppDbContext _db;
     private readonly BookingWorkflowService _workflow;
+    private const string MockMethod = "MOCK";
 
     public PaymentService(AppDbContext db, BookingWorkflowService workflow)
     {
@@ -28,8 +29,18 @@ public class PaymentService
             throw new UnauthorizedAccessException("Not your booking");
 
         // Idempotency: 1 booking has 1 payment per type
+        var normalizedMethod = string.IsNullOrWhiteSpace(method) ? MockMethod : method.Trim().ToUpperInvariant();
         var existing = await _db.Payments.FirstOrDefaultAsync(p => p.BookingId == bookingId && p.Type == type);
-        if (existing != null) return existing;
+        if (existing != null)
+        {
+            if (normalizedMethod == MockMethod && existing.Status != PaymentStatus.SUCCESS)
+            {
+                existing.Method = MockMethod;
+                await MarkPaymentSuccessAsync(existing, booking);
+            }
+
+            return existing;
+        }
 
         var amount = type == PaymentTypes.DEPOSIT ? booking.DepositAmount : booking.RemainingAmount;
 
@@ -39,7 +50,7 @@ public class PaymentService
             BookingId = bookingId,
             Type = type,
             Status = PaymentStatus.PENDING,
-            Method = string.IsNullOrWhiteSpace(method) ? "MOCK" : method,
+            Method = normalizedMethod,
             Amount = amount,
             Currency = booking.Currency,
             ProviderTxnId = null,
@@ -51,6 +62,12 @@ public class PaymentService
 
         _db.Payments.Add(payment);
         await _db.SaveChangesAsync();
+
+        if (normalizedMethod == MockMethod)
+        {
+            await MarkPaymentSuccessAsync(payment, booking);
+        }
+
         return payment;
     }
 
@@ -101,6 +118,28 @@ public class PaymentService
 
         await _db.SaveChangesAsync();
         return new { ok = true, message = "Payment failed recorded" };
+    }
+
+    private async Task MarkPaymentSuccessAsync(Payment payment, Booking booking)
+    {
+        if (payment.Status == PaymentStatus.SUCCESS)
+            return;
+
+        payment.Status = PaymentStatus.SUCCESS;
+        payment.PaidAt = DateTime.UtcNow;
+        payment.UpdatedAt = DateTime.UtcNow;
+        payment.ProviderTxnId ??= $"MOCK-{payment.Id:N}";
+
+        await _db.SaveChangesAsync();
+
+        if (payment.Type == PaymentTypes.DEPOSIT)
+        {
+            await _workflow.MarkDepositPaidAsync(booking.Id, booking.CustomerId);
+        }
+        else
+        {
+            await _workflow.MarkRemainingPaidAsync(booking.Id, booking.CustomerId);
+        }
     }
 }
 
